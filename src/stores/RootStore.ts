@@ -1,10 +1,13 @@
-import CounterStore from './CounterStore'
+import { LeadStore } from './LeadStore'
+import { CallLogStore } from './CallLogStore'
 
 class RootStore {
-  counterStore: CounterStore
+  leadStore: LeadStore
+  callLogStore: CallLogStore
 
   constructor() {
-    this.counterStore = new CounterStore()
+    this.leadStore = new LeadStore()
+    this.callLogStore = new CallLogStore()
   }
 }
 
