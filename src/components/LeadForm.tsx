@@ -3,7 +3,9 @@ import { observer } from "mobx-react-lite";
 import styled from "styled-components";
 import { toast } from "sonner";
 import { useStore } from "../hooks/useStore";
-import type { Lead, LeadStatus } from "../types";
+import type { Lead, LeadStatus, DealStage, OpportunitySize, Product } from "../types";
+import * as Select from '@radix-ui/react-select';
+import { ChevronDown } from 'lucide-react';
 
 interface LeadFormProps {
   lead?: Lead;
@@ -27,6 +29,12 @@ const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+`;
+
+const FormRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 `;
 
 const Label = styled.label`
@@ -134,12 +142,95 @@ const FormTitle = styled.h2`
   font-weight: 700;
 `;
 
+const SelectTrigger = styled(Select.Trigger)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  color: #374151;
+  cursor: pointer;
+  min-width: 150px;
+  
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  &[data-placeholder] {
+    color: #9ca3af;
+  }
+`;
+
+const SelectContent = styled(Select.Content)`
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 1002;
+`;
+
+const SelectItem = styled(Select.Item)`
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 4px;
+  outline: none;
+  
+  &:hover, &[data-highlighted] {
+    background-color: #f3f4f6;
+  }
+  
+  &[data-state="checked"] {
+    background-color: #eff6ff;
+    color: #2563eb;
+  }
+`;
+
+const SelectIcon = styled(Select.Icon)`
+  color: #6b7280;
+`;
+
+const ProductsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+const ProductTag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: #eff6ff;
+  color: #2563eb;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #dbeafe;
+  }
+`;
+
 interface FormData {
   name: string;
   company: string;
   phone: string;
   email: string;
   accountOwner: string;
+  dealStage: DealStage;
+  opportunitySize: OpportunitySize;
+  products: Product[];
 }
 
 interface FormErrors {
@@ -159,6 +250,9 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
       phone: lead?.phone || "",
       email: lead?.email || "",
       accountOwner: lead?.accountOwner || "Sammy",
+      dealStage: lead?.dealStage || "new",
+      opportunitySize: lead?.opportunitySize || "<$50k",
+      products: lead?.products || [],
     });
 
     const [createAnother, setCreateAnother] = useState(false);
@@ -175,6 +269,9 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
           phone: lead.phone,
           email: lead.email,
           accountOwner: lead.accountOwner,
+          dealStage: lead.dealStage,
+          opportunitySize: lead.opportunitySize,
+          products: lead.products,
         });
       }
     }, [lead]);
@@ -229,6 +326,9 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
             accountOwner: formData.accountOwner?.trim() || "",
             status: lead.status, // Preserve existing status
             notes: lead.notes || "", // Preserve existing notes
+            dealStage: formData.dealStage,
+            opportunitySize: formData.opportunitySize,
+            products: formData.products,
           });
 
           if (success) {
@@ -263,6 +363,9 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
               phone: "",
               email: "",
               accountOwner: "Sammy",
+              dealStage: "new",
+              opportunitySize: "<$50k",
+              products: [],
             });
             setErrors({});
             setEmailExists(false);
@@ -277,7 +380,7 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
       }
     };
 
-    const handleInputChange = (field: keyof FormData, value: string) => {
+    const handleInputChange = (field: keyof FormData, value: string | Product[]) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
       // Clear error when user starts typing
       if (errors[field as keyof FormErrors]) {
@@ -285,7 +388,7 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
       }
 
       // Check for duplicate email when email field changes
-      if (field === "email" && value?.trim()) {
+      if (field === "email" && typeof value === "string" && value?.trim()) {
         const isDuplicate = leadStore.checkEmailExists(value.trim(), lead?.id);
         setEmailExists(isDuplicate);
         if (isDuplicate) {
@@ -294,7 +397,7 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
       }
 
       // Check for similar phone number when phone field changes
-      if (field === "phone" && value?.trim()) {
+      if (field === "phone" && typeof value === "string" && value?.trim()) {
         const similarLead = leadStore.checkSimilarPhone(value.trim(), lead?.id);
         if (similarLead) {
           toast.warning(`${similarLead.name} from ${similarLead.company} is also using this number`);
@@ -319,18 +422,36 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
           {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
         </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="company">Company *</Label>
-          <Input
-            id="company"
-            type="text"
-            value={formData.company}
-            onChange={(e) => handleInputChange("company", e.target.value)}
-            $hasError={!!errors.company}
-            placeholder="Enter company name"
-          />
-          {errors.company && <ErrorMessage>{errors.company}</ErrorMessage>}
-        </FormGroup>
+        <FormRow>
+          <FormGroup>
+            <Label htmlFor="company">Company *</Label>
+            <Input
+              id="company"
+              type="text"
+              value={formData.company}
+              onChange={(e) => handleInputChange("company", e.target.value)}
+              $hasError={!!errors.company}
+              placeholder="Enter company name"
+            />
+            {errors.company && <ErrorMessage>{errors.company}</ErrorMessage>}
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              $hasError={!!errors.email || emailExists}
+              placeholder="Enter email address"
+            />
+            {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+            {emailExists && (
+              <ErrorMessage>A lead with this email already exists</ErrorMessage>
+            )}
+          </FormGroup>
+        </FormRow>
 
         <FormGroup>
           <Label htmlFor="phone">Phone</Label>
@@ -345,32 +466,144 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
           {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
         </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            $hasError={!!errors.email || emailExists}
-            placeholder="Enter email address"
-          />
-          {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-          {emailExists && (
-            <ErrorMessage>A lead with this email already exists</ErrorMessage>
-          )}
-        </FormGroup>
+        <FormRow>
+          <FormGroup>
+            <Label>Deal Stage</Label>
+            <Select.Root value={formData.dealStage} onValueChange={(value) => handleInputChange("dealStage", value)}>
+              <SelectTrigger>
+                <Select.Value placeholder="Select deal stage..." />
+                <SelectIcon>
+                  <ChevronDown size={16} />
+                </SelectIcon>
+              </SelectTrigger>
+              <Select.Portal>
+                <SelectContent>
+                  <Select.Viewport>
+                    <SelectItem value="new">
+                      <Select.ItemText>New</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="demo">
+                      <Select.ItemText>Demo</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="onboarding">
+                      <Select.ItemText>Onboarding</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="integrating">
+                      <Select.ItemText>Integrating</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="testing">
+                      <Select.ItemText>Testing</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="live">
+                      <Select.ItemText>Live</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="revenue-generating">
+                      <Select.ItemText>Revenue Generating</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="blocked">
+                      <Select.ItemText>Blocked</Select.ItemText>
+                    </SelectItem>
+                  </Select.Viewport>
+                </SelectContent>
+              </Select.Portal>
+            </Select.Root>
+          </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="accountOwner">Account Owner</Label>
-          <Input
-            id="accountOwner"
-            type="text"
-            value={formData.accountOwner}
-            onChange={(e) => handleInputChange("accountOwner", e.target.value)}
-            placeholder="Enter account owner name"
-          />
-        </FormGroup>
+          <FormGroup>
+            <Label htmlFor="accountOwner">Account Owner</Label>
+            <Input
+              id="accountOwner"
+              type="text"
+              value={formData.accountOwner}
+              onChange={(e) => handleInputChange("accountOwner", e.target.value)}
+              placeholder="Enter account owner name"
+            />
+          </FormGroup>
+        </FormRow>
+
+        <FormRow>
+          <FormGroup>
+            <Label>Opportunity Size</Label>
+            <Select.Root value={formData.opportunitySize} onValueChange={(value) => handleInputChange("opportunitySize", value)}>
+              <SelectTrigger>
+                <Select.Value placeholder="Select opportunity size..." />
+                <SelectIcon>
+                  <ChevronDown size={16} />
+                </SelectIcon>
+              </SelectTrigger>
+              <Select.Portal>
+                <SelectContent>
+                  <Select.Viewport>
+                    <SelectItem value="<$50k">
+                      <Select.ItemText>Less than $50k</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="$50k-$200k">
+                      <Select.ItemText>$50k - $200k</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="$500k-$1m">
+                      <Select.ItemText>$500k - $1m</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="$1m-$5m">
+                      <Select.ItemText>$1m - $5m</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value=">$5m">
+                      <Select.ItemText>More than $5m</Select.ItemText>
+                    </SelectItem>
+                  </Select.Viewport>
+                </SelectContent>
+              </Select.Portal>
+            </Select.Root>
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Products</Label>
+            <Select.Root 
+              value={""} 
+              onValueChange={(value) => {
+                if (!formData.products.includes(value as Product)) {
+                  handleInputChange("products", [...formData.products, value as Product]);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <Select.Value placeholder="Add products..." />
+                <SelectIcon>
+                  <ChevronDown size={16} />
+                </SelectIcon>
+              </SelectTrigger>
+              <Select.Portal>
+                <SelectContent>
+                  <Select.Viewport>
+                    <SelectItem value="API">
+                      <Select.ItemText>API</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="Payments">
+                      <Select.ItemText>Payments</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="Ramp">
+                      <Select.ItemText>Ramp</Select.ItemText>
+                    </SelectItem>
+                    <SelectItem value="OTC">
+                      <Select.ItemText>OTC</Select.ItemText>
+                    </SelectItem>
+                  </Select.Viewport>
+                </SelectContent>
+              </Select.Portal>
+            </Select.Root>
+            <ProductsContainer>
+              {formData.products?.map((product) => (
+                <ProductTag 
+                  key={product}
+                  onClick={() => {
+                    handleInputChange("products", formData.products.filter(p => p !== product));
+                  }}
+                >
+                  {product} ×
+                </ProductTag>
+              ))}
+            </ProductsContainer>
+          </FormGroup>
+        </FormRow>
 
         <ButtonGroup>
           {!lead && (

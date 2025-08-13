@@ -7,7 +7,7 @@ class RootStore {
 
   constructor() {
     this.leadStore = new LeadStore()
-    this.callLogStore = new CallLogStore()
+    this.callLogStore = new CallLogStore(this.leadStore)
   }
 }
 

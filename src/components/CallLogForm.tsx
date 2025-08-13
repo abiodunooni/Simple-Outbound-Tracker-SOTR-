@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
+import * as Select from '@radix-ui/react-select'
+import * as Popover from '@radix-ui/react-popover'
+import { DayPicker } from 'react-day-picker'
+import { Calendar, ChevronDown } from 'lucide-react'
 import { useStore } from '../hooks/useStore'
 import type { CallLog, CallLogType, CallOutcome, Lead } from '../types'
+import 'react-day-picker/dist/style.css'
 
 interface CallLogFormProps {
   callLog?: CallLog
@@ -54,18 +59,95 @@ const Input = styled.input<{ $hasError?: boolean }>`
   }
 `
 
-const Select = styled.select<{ $hasError?: boolean }>`
+const SelectTrigger = styled(Select.Trigger)<{ $hasError?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px 12px;
   border: 1px solid ${props => props.$hasError ? '#dc2626' : '#d1d5db'};
   border-radius: 6px;
   font-size: 14px;
   background-color: white;
+  color: #374151;
+  cursor: pointer;
+  min-width: 150px;
   
   &:focus {
     outline: none;
     border-color: ${props => props.$hasError ? '#dc2626' : '#3b82f6'};
     box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(220, 38, 38, 0.1)' : 'rgba(59, 130, 246, 0.1)'};
   }
+  
+  &[data-placeholder] {
+    color: #9ca3af;
+  }
+`
+
+const SelectContent = styled(Select.Content)`
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 1002;
+`
+
+const SelectItem = styled(Select.Item)`
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 4px;
+  outline: none;
+  
+  &:hover, &[data-highlighted] {
+    background-color: #f3f4f6;
+  }
+  
+  &[data-state="checked"] {
+    background-color: #eff6ff;
+    color: #2563eb;
+  }
+`
+
+const SelectIcon = styled(Select.Icon)`
+  color: #6b7280;
+`
+
+const DateButton = styled.button<{ $hasError?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid ${props => props.$hasError ? '#dc2626' : '#d1d5db'};
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  
+  &:focus {
+    outline: none;
+    border-color: ${props => props.$hasError ? '#dc2626' : '#3b82f6'};
+    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(220, 38, 38, 0.1)' : 'rgba(59, 130, 246, 0.1)'};
+  }
+  
+  &:hover {
+    background-color: #f9fafb;
+  }
+`
+
+const DatePickerPopover = styled(Popover.Content)`
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  z-index: 1002;
 `
 
 const TextArea = styled.textarea`
@@ -138,47 +220,28 @@ const FormTitle = styled.h2`
   font-weight: 700;
 `
 
-const LeadInfo = styled.div`
-  padding: 12px 16px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  margin-bottom: 8px;
-`
-
-const LeadName = styled.span`
-  font-weight: 600;
-  color: #1f2937;
-`
-
-const LeadCompany = styled.span`
-  color: #6b7280;
-  margin-left: 8px;
-`
 
 interface FormData {
-  leadId: string
   type: CallLogType
-  date: string
-  duration: string
+  date: Date | null
   outcome: CallOutcome
   notes: string
-  otherPeople: string
-  nextAction: string
-  scheduledFollowUp: string
+  caller: string
 }
 
 interface FormErrors {
-  leadId?: string
   date?: string
-  duration?: string
   outcome?: string
 }
 
-const formatDateForInput = (date: Date) => {
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16)
+const formatDateDisplay = (date: Date | null) => {
+  if (!date) return 'Select date'
+  return new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date)
 }
 
 export const CallLogForm: React.FC<CallLogFormProps> = observer(({ 
@@ -191,15 +254,11 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
   const { leadStore, callLogStore } = useStore()
   
   const [formData, setFormData] = useState<FormData>({
-    leadId: callLog?.leadId || selectedLead?.id || leadId || '',
     type: callLog?.type || 'call',
-    date: callLog ? formatDateForInput(new Date(callLog.date)) : formatDateForInput(new Date()),
-    duration: callLog?.duration?.toString() || '',
+    date: callLog ? new Date(callLog.date) : new Date(),
     outcome: callLog?.outcome || 'connected',
     notes: callLog?.notes || '',
-    otherPeople: callLog?.otherPeople || '',
-    nextAction: callLog?.nextAction || '',
-    scheduledFollowUp: callLog?.scheduledFollowUp ? formatDateForInput(new Date(callLog.scheduledFollowUp)) : ''
+    caller: callLog?.caller || 'Sammy'
   })
 
   const [errors, setErrors] = useState<FormErrors>({})
@@ -208,15 +267,11 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
   useEffect(() => {
     if (callLog) {
       setFormData({
-        leadId: callLog.leadId,
         type: callLog.type,
-        date: formatDateForInput(new Date(callLog.date)),
-        duration: callLog.duration?.toString() || '',
+        date: new Date(callLog.date),
         outcome: callLog.outcome || 'connected',
         notes: callLog.notes,
-        otherPeople: callLog.otherPeople,
-        nextAction: callLog.nextAction || '',
-        scheduledFollowUp: callLog.scheduledFollowUp ? formatDateForInput(new Date(callLog.scheduledFollowUp)) : ''
+        caller: callLog.caller
       })
     }
   }, [callLog])
@@ -224,18 +279,8 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
 
-    if (!formData.leadId) {
-      newErrors.leadId = 'Please select a lead'
-    }
-
     if (!formData.date) {
       newErrors.date = 'Date is required'
-    }
-
-    if (!formData.duration) {
-      newErrors.duration = 'Duration is required'
-    } else if (isNaN(Number(formData.duration)) || Number(formData.duration) < 0) {
-      newErrors.duration = 'Duration must be a valid number'
     }
 
     if (!formData.outcome) {
@@ -257,15 +302,13 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
 
     try {
       const callLogData = {
-        leadId: formData.leadId,
+        leadId: leadId || callLog?.leadId || '',
         type: formData.type,
-        date: new Date(formData.date),
-        duration: formData.duration ? Number(formData.duration) : undefined,
+        date: formData.date || new Date(),
         outcome: formData.outcome || undefined,
         notes: formData.notes.trim(),
-        otherPeople: formData.otherPeople.trim(),
-        nextAction: formData.nextAction.trim() || undefined,
-        scheduledFollowUp: formData.scheduledFollowUp ? new Date(formData.scheduledFollowUp) : undefined
+        otherPeople: '',
+        caller: formData.caller
       }
 
       if (callLog) {
@@ -276,7 +319,7 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
         // Create new call log
         callLogStore.addCallLog(callLogData)
         // Update lead's last contacted date
-        leadStore.updateLastContacted(formData.leadId, new Date(formData.date))
+        leadStore.updateLastContacted(callLogData.leadId, formData.date || new Date())
         onSave(true)
       }
     } catch {
@@ -286,7 +329,7 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
     }
   }
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
+  const handleInputChange = (field: keyof FormData, value: string | Date | null) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     // Clear error when user starts typing
     if (errors[field as keyof FormErrors]) {
@@ -294,117 +337,148 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
     }
   }
 
-  const selectedLeadData = selectedLead || (formData.leadId ? leadStore.getLeadById(formData.leadId) : undefined)
+  const selectedLeadData = selectedLead || (leadId ? leadStore.getLeadById(leadId) : undefined)
 
   return (
     <Form onSubmit={handleSubmit}>
       <FormTitle>
-        {callLog ? 'Edit Call Log' : 'Log New Call'}
+        {callLog ? 'Edit Call Log' : `Log New Call${selectedLeadData ? ` for ${selectedLeadData.name}` : ''}`}
       </FormTitle>
 
-      {selectedLeadData && (
-        <LeadInfo>
-          <LeadName>{selectedLeadData.name}</LeadName>
-          <LeadCompany>at {selectedLeadData.company}</LeadCompany>
-        </LeadInfo>
-      )}
-
-      {!selectedLead && (
-        <FormGroup>
-          <Label htmlFor="leadId">Lead *</Label>
-          <Select
-            id="leadId"
-            value={formData.leadId}
-            onChange={(e) => handleInputChange('leadId', e.target.value)}
-            $hasError={!!errors.leadId}
-          >
-            <option value="">Select a lead...</option>
-            {leadStore.leads.map((lead) => (
-              <option key={lead.id} value={lead.id}>
-                {lead.name} - {lead.company}
-              </option>
-            ))}
-          </Select>
-          {errors.leadId && <ErrorMessage>{errors.leadId}</ErrorMessage>}
-        </FormGroup>
-      )}
 
       <FormRow>
         <FormGroup>
-          <Label htmlFor="type">Communication Type</Label>
-          <Select
-            id="type"
-            value={formData.type}
-            onChange={(e) => handleInputChange('type', e.target.value)}
-          >
-            <option value="email">Email</option>
-            <option value="call">Phone Call</option>
-            <option value="whatsapp">WhatsApp</option>
-            <option value="conference-call">Conference Call</option>
-            <option value="physical-meeting">Physical Meeting</option>
-            <option value="others">Others</option>
-          </Select>
+          <Label>Communication Type</Label>
+          <Select.Root value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+            <SelectTrigger>
+              <Select.Value placeholder="Select type..." />
+              <SelectIcon>
+                <ChevronDown size={16} />
+              </SelectIcon>
+            </SelectTrigger>
+            <Select.Portal>
+              <SelectContent>
+                <Select.Viewport>
+                  <SelectItem value="email">
+                    <Select.ItemText>Email</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="call">
+                    <Select.ItemText>Phone Call</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="whatsapp">
+                    <Select.ItemText>WhatsApp</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="conference-call">
+                    <Select.ItemText>Conference Call</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="physical-meeting">
+                    <Select.ItemText>Physical Meeting</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="others">
+                    <Select.ItemText>Others</Select.ItemText>
+                  </SelectItem>
+                </Select.Viewport>
+              </SelectContent>
+            </Select.Portal>
+          </Select.Root>
         </FormGroup>
 
         <FormGroup>
-          <Label htmlFor="outcome">Outcome *</Label>
-          <Select
-            id="outcome"
-            value={formData.outcome}
-            onChange={(e) => handleInputChange('outcome', e.target.value)}
-            $hasError={!!errors.outcome}
-          >
-            <option value="connected">Connected</option>
-            <option value="voicemail">Voicemail</option>
-            <option value="no-answer">No Answer</option>
-            <option value="busy">Busy</option>
-            <option value="meeting-scheduled">Meeting Scheduled</option>
-            <option value="not-interested">Not Interested</option>
-            <option value="callback-requested">Callback Requested</option>
-          </Select>
+          <Label>Caller</Label>
+          <Select.Root value={formData.caller} onValueChange={(value) => handleInputChange('caller', value)}>
+            <SelectTrigger>
+              <Select.Value placeholder="Select caller..." />
+              <SelectIcon>
+                <ChevronDown size={16} />
+              </SelectIcon>
+            </SelectTrigger>
+            <Select.Portal>
+              <SelectContent>
+                <Select.Viewport>
+                  <SelectItem value="Sammy">
+                    <Select.ItemText>Sammy</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="John">
+                    <Select.ItemText>John</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="Sarah">
+                    <Select.ItemText>Sarah</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="Mike">
+                    <Select.ItemText>Mike</Select.ItemText>
+                  </SelectItem>
+                </Select.Viewport>
+              </SelectContent>
+            </Select.Portal>
+          </Select.Root>
+        </FormGroup>
+      </FormRow>
+
+      <FormRow>
+        <FormGroup>
+          <Label>Outcome *</Label>
+          <Select.Root value={formData.outcome} onValueChange={(value) => handleInputChange('outcome', value)}>
+            <SelectTrigger $hasError={!!errors.outcome}>
+              <Select.Value placeholder="Select outcome..." />
+              <SelectIcon>
+                <ChevronDown size={16} />
+              </SelectIcon>
+            </SelectTrigger>
+            <Select.Portal>
+              <SelectContent>
+                <Select.Viewport>
+                  <SelectItem value="connected">
+                    <Select.ItemText>Connected</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="voicemail">
+                    <Select.ItemText>Voicemail</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="no-answer">
+                    <Select.ItemText>No Answer</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="busy">
+                    <Select.ItemText>Busy</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="meeting-scheduled">
+                    <Select.ItemText>Meeting Scheduled</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="not-interested">
+                    <Select.ItemText>Not Interested</Select.ItemText>
+                  </SelectItem>
+                  <SelectItem value="callback-requested">
+                    <Select.ItemText>Callback Requested</Select.ItemText>
+                  </SelectItem>
+                </Select.Viewport>
+              </SelectContent>
+            </Select.Portal>
+          </Select.Root>
           {errors.outcome && <ErrorMessage>{errors.outcome}</ErrorMessage>}
         </FormGroup>
-      </FormRow>
 
-      <FormRow>
         <FormGroup>
-          <Label htmlFor="date">Date & Time *</Label>
-          <Input
-            id="date"
-            type="datetime-local"
-            value={formData.date}
-            onChange={(e) => handleInputChange('date', e.target.value)}
-            $hasError={!!errors.date}
-          />
+          <Label>Date *</Label>
+          <Popover.Root>
+            <Popover.Trigger asChild>
+              <DateButton $hasError={!!errors.date}>
+                <Calendar size={16} />
+                {formatDateDisplay(formData.date)}
+              </DateButton>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <DatePickerPopover>
+                <DayPicker
+                  mode="single"
+                  selected={formData.date || undefined}
+                  onSelect={(date) => handleInputChange('date', date || null)}
+                  showOutsideDays
+                />
+              </DatePickerPopover>
+            </Popover.Portal>
+          </Popover.Root>
           {errors.date && <ErrorMessage>{errors.date}</ErrorMessage>}
         </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="duration">Duration (minutes) *</Label>
-          <Input
-            id="duration"
-            type="number"
-            min="0"
-            step="1"
-            value={formData.duration}
-            onChange={(e) => handleInputChange('duration', e.target.value)}
-            $hasError={!!errors.duration}
-            placeholder="0"
-          />
-          {errors.duration && <ErrorMessage>{errors.duration}</ErrorMessage>}
-        </FormGroup>
       </FormRow>
 
-      <FormGroup>
-        <Label htmlFor="otherPeople">Other People Involved</Label>
-        <Input
-          id="otherPeople"
-          type="text"
-          value={formData.otherPeople}
-          onChange={(e) => handleInputChange('otherPeople', e.target.value)}
-          placeholder="e.g., John Smith, Sarah Jones"
-        />
-      </FormGroup>
 
       <FormGroup>
         <Label htmlFor="notes">Notes</Label>
@@ -416,26 +490,6 @@ export const CallLogForm: React.FC<CallLogFormProps> = observer(({
         />
       </FormGroup>
 
-      <FormGroup>
-        <Label htmlFor="nextAction">Next Action</Label>
-        <Input
-          id="nextAction"
-          type="text"
-          value={formData.nextAction}
-          onChange={(e) => handleInputChange('nextAction', e.target.value)}
-          placeholder="What's the next step with this lead?"
-        />
-      </FormGroup>
-
-      <FormGroup>
-        <Label htmlFor="scheduledFollowUp">Scheduled Follow-up</Label>
-        <Input
-          id="scheduledFollowUp"
-          type="datetime-local"
-          value={formData.scheduledFollowUp}
-          onChange={(e) => handleInputChange('scheduledFollowUp', e.target.value)}
-        />
-      </FormGroup>
 
       <ButtonGroup>
         <Button type="button" onClick={onCancel}>

@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import type { Lead, LeadStatus, FilterCondition } from '../types'
+import type { Lead, LeadStatus, FilterCondition, CallLog } from '../types'
 import { LocalStorageManager, STORAGE_KEYS } from '../utils/localStorage'
 
 export class LeadStore {
@@ -79,7 +79,7 @@ export class LeadStore {
     }) || null
   }
 
-  addLead(leadData: Omit<Lead, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'lastContactedAt' | 'accountOwner'>): { success: boolean; lead?: Lead; error?: string } {
+  addLead(leadData: Omit<Lead, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'lastContactedAt' | 'accountOwner' | 'dealStage' | 'opportunitySize' | 'products'>): { success: boolean; lead?: Lead; error?: string } {
     // Check for duplicate email
     if (this.checkEmailExists(leadData.email)) {
       return {
@@ -95,7 +95,10 @@ export class LeadStore {
       updatedAt: new Date(),
       createdBy: 'Sammy', // Default user for demo
       accountOwner: 'Sammy', // Default to creator
-      lastContactedAt: null
+      lastContactedAt: null,
+      dealStage: 'new',
+      opportunitySize: '<$50k',
+      products: []
     }
 
     this.leads.push(newLead)
@@ -142,6 +145,65 @@ export class LeadStore {
 
   updateLastContacted(id: string, date: Date = new Date()): void {
     this.updateLead(id, { lastContactedAt: date })
+    // Recalculate status based on new interaction
+    this.updateLeadStatus(id)
+  }
+
+  calculateLeadStatus(leadId: string, callLogs: CallLog[]): LeadStatus {
+    const leadCallLogs = callLogs.filter(log => log.leadId === leadId)
+    
+    if (leadCallLogs.length === 0) {
+      return 'Cold'
+    }
+
+    // Sort by date, most recent first
+    const sortedLogs = leadCallLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    const mostRecentLog = sortedLogs[0]
+    const now = new Date()
+    const daysSinceLastContact = Math.floor((now.getTime() - new Date(mostRecentLog.date).getTime()) / (1000 * 60 * 60 * 24))
+
+    // Cold: no contact in 7+ days
+    if (daysSinceLastContact >= 7) {
+      return 'Cold'
+    }
+
+    // Count logs in the last 7 days
+    const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000))
+    const recentLogs = leadCallLogs.filter(log => new Date(log.date) >= sevenDaysAgo)
+
+    // Hot: 3+ interactions in the last 7 days
+    if (recentLogs.length >= 3) {
+      return 'Hot'
+    }
+
+    // Warm: 2+ interactions in the last 7 days
+    if (recentLogs.length >= 2) {
+      return 'Warm'
+    }
+
+    // Default to Cold
+    return 'Cold'
+  }
+
+  updateLeadStatus(leadId: string, callLogs?: CallLog[]): void {
+    if (!callLogs) {
+      // If no call logs provided, we'll need to get them from the call log store
+      // For now, skip the update - this will be called with call logs from the component
+      return
+    }
+    
+    const newStatus = this.calculateLeadStatus(leadId, callLogs)
+    this.updateLead(leadId, { status: newStatus })
+  }
+
+  // Method to recalculate all lead statuses when call logs are available
+  recalculateAllLeadStatuses(callLogs: CallLog[]): void {
+    this.leads.forEach(lead => {
+      const newStatus = this.calculateLeadStatus(lead.id, callLogs)
+      if (lead.status !== newStatus) {
+        this.updateLead(lead.id, { status: newStatus })
+      }
+    })
   }
 
   setSearchQuery(query: string): void {

@@ -5,18 +5,19 @@ import { useSidebar } from "../context/SidebarContext";
 
 const AppContainer = styled.div`
   min-height: 100vh;
-  background: white;
+  background: var(--background-primary);
   display: flex;
+  transition: background 0.3s ease;
 `;
 
 const MainContent = styled.main<{
-  sidebarWidth: number;
-  isCollapsed: boolean;
+  $sidebarWidth: number;
+  $isCollapsed: boolean;
 }>`
   flex: 1;
   margin-left: ${(props) => {
-    if (props.isCollapsed) return "0px";
-    return `${props.sidebarWidth}px`;
+    if (props.$isCollapsed) return "0px";
+    return `${props.$sidebarWidth}px`;
   }};
   min-height: 100vh;
   display: flex;
@@ -37,7 +38,7 @@ export const Layout = () => {
   return (
     <AppContainer>
       <Navigation />
-      <MainContent sidebarWidth={sidebarWidth} isCollapsed={isCollapsed}>
+      <MainContent $sidebarWidth={sidebarWidth} $isCollapsed={isCollapsed}>
         <ContentArea>
           <Outlet />
         </ContentArea>

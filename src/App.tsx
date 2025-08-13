@@ -7,22 +7,25 @@ import { LeadDetail } from "./pages/LeadDetail";
 import { CallHistory } from "./pages/CallHistory";
 import { Analytics } from "./pages/Analytics";
 import { SidebarProvider } from "./context/SidebarContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
   return (
-    <SidebarProvider>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="leads" element={<Leads />} />
-          <Route path="leads/:id" element={<LeadDetail />} />
-          <Route path="calls" element={<CallHistory />} />
-          <Route path="analytics" element={<Analytics />} />
-        </Route>
-        <Route path="*" element={<div>Not Found</div>} />
-      </Routes>
-      <Toaster />
-    </SidebarProvider>
+    <ThemeProvider>
+      <SidebarProvider>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="leads" element={<Leads />} />
+            <Route path="leads/:id" element={<LeadDetail />} />
+            <Route path="calls" element={<CallHistory />} />
+            <Route path="analytics" element={<Analytics />} />
+          </Route>
+          <Route path="*" element={<div>Not Found</div>} />
+        </Routes>
+        <Toaster />
+      </SidebarProvider>
+    </ThemeProvider>
   );
 }
 

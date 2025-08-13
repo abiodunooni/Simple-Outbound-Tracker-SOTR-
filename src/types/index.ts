@@ -4,6 +4,12 @@ export type CallLogType = 'email' | 'call' | 'whatsapp' | 'conference-call' | 'p
 
 export type CallOutcome = 'connected' | 'voicemail' | 'no-answer' | 'busy' | 'meeting-scheduled' | 'not-interested' | 'callback-requested'
 
+export type DealStage = 'new' | 'demo' | 'onboarding' | 'integrating' | 'testing' | 'live' | 'revenue-generating' | 'blocked'
+
+export type OpportunitySize = '<$50k' | '$50k-$200k' | '$500k-$1m' | '$1m-$5m' | '>$5m'
+
+export type Product = 'API' | 'Payments' | 'Ramp' | 'OTC'
+
 export interface Lead {
   id: string
   name: string
@@ -17,6 +23,9 @@ export interface Lead {
   createdBy: string
   accountOwner: string
   lastContactedAt: Date | null
+  dealStage: DealStage
+  opportunitySize: OpportunitySize
+  products: Product[]
 }
 
 export interface CallLog {
@@ -30,6 +39,7 @@ export interface CallLog {
   otherPeople: string // comma-separated list of other people involved
   nextAction?: string // optional
   scheduledFollowUp?: Date | null // optional
+  caller: string // who made the call
 }
 
 export interface DashboardMetrics {
@@ -71,13 +81,16 @@ export interface FilterCondition {
   id: string
   field: keyof Lead
   operator: FilterOperator
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value2?: any // For between operations
   dataType: FilterDataType
 }
 
 export interface FilterOption {
   label: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any
 }
 

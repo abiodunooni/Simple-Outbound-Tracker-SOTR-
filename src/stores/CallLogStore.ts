@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { CallLog, CallLogType, CallOutcome } from "../types";
 import { LocalStorageManager, STORAGE_KEYS } from "../utils/localStorage";
+import type { LeadStore } from "./LeadStore";
 
 export class CallLogStore {
   callLogs: CallLog[] = [];
@@ -9,9 +10,11 @@ export class CallLogStore {
   outcomeFilter: CallOutcome | "all" = "all";
   sortBy: "date" | "duration" = "date";
   sortOrder: "asc" | "desc" = "desc";
+  private leadStore?: LeadStore;
 
-  constructor() {
+  constructor(leadStore?: LeadStore) {
     makeAutoObservable(this);
+    this.leadStore = leadStore;
     this.loadCallLogs();
   }
 
@@ -50,6 +53,13 @@ export class CallLogStore {
 
       this.callLogs.push(newCallLog);
       this.saveCallLogs();
+
+      // Update lead status and last contacted date
+      if (this.leadStore) {
+        this.leadStore.updateLastContacted(newCallLog.leadId, new Date(newCallLog.date));
+        this.leadStore.updateLeadStatus(newCallLog.leadId, this.callLogs);
+      }
+
       return { success: true, callLog: newCallLog };
     } catch (error) {
       return { success: false, error: 'Failed to add call log' };
