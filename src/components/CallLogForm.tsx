@@ -23,7 +23,7 @@ const Form = styled.form`
   gap: 16px;
   max-width: 500px;
   padding: 24px;
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `
@@ -42,21 +42,8 @@ const FormRow = styled.div`
 
 const Label = styled.label`
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   font-size: 14px;
-`
-
-const Input = styled.input<{ $hasError?: boolean }>`
-  padding: 10px 12px;
-  border: 1px solid ${props => props.$hasError ? '#dc2626' : '#d1d5db'};
-  border-radius: 6px;
-  font-size: 14px;
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.$hasError ? '#dc2626' : '#3b82f6'};
-    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(220, 38, 38, 0.1)' : 'rgba(59, 130, 246, 0.1)'};
-  }
 `
 
 const SelectTrigger = styled(Select.Trigger)<{ $hasError?: boolean }>`
@@ -64,28 +51,28 @@ const SelectTrigger = styled(Select.Trigger)<{ $hasError?: boolean }>`
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border: 1px solid ${props => props.$hasError ? '#dc2626' : '#d1d5db'};
+  border: 1px solid ${props => props.$hasError ? 'var(--error)' : 'var(--border-color)'};
   border-radius: 6px;
   font-size: 14px;
-  background-color: white;
-  color: #374151;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   cursor: pointer;
   min-width: 150px;
   
   &:focus {
     outline: none;
-    border-color: ${props => props.$hasError ? '#dc2626' : '#3b82f6'};
+    border-color: ${props => props.$hasError ? 'var(--error)' : 'var(--accent-primary)'};
     box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(220, 38, 38, 0.1)' : 'rgba(59, 130, 246, 0.1)'};
   }
   
   &[data-placeholder] {
-    color: #9ca3af;
+    color: var(--text-muted);
   }
 `
 
 const SelectContent = styled(Select.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 4px;
@@ -97,23 +84,23 @@ const SelectItem = styled(Select.Item)`
   align-items: center;
   padding: 8px 12px;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   cursor: pointer;
   border-radius: 4px;
   outline: none;
   
   &:hover, &[data-highlighted] {
-    background-color: #f3f4f6;
+    background-color: var(--background-hover);
   }
   
   &[data-state="checked"] {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--accent-primary);
+    color: white;
   }
 `
 
 const SelectIcon = styled(Select.Icon)`
-  color: #6b7280;
+  color: var(--text-muted);
 `
 
 const DateButton = styled.button<{ $hasError?: boolean }>`
@@ -121,29 +108,29 @@ const DateButton = styled.button<{ $hasError?: boolean }>`
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border: 1px solid ${props => props.$hasError ? '#dc2626' : '#d1d5db'};
+  border: 1px solid ${props => props.$hasError ? 'var(--error)' : 'var(--border-color)'};
   border-radius: 6px;
   font-size: 14px;
-  background-color: white;
-  color: #374151;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   cursor: pointer;
   text-align: left;
   width: 100%;
   
   &:focus {
     outline: none;
-    border-color: ${props => props.$hasError ? '#dc2626' : '#3b82f6'};
+    border-color: ${props => props.$hasError ? 'var(--error)' : 'var(--accent-primary)'};
     box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(220, 38, 38, 0.1)' : 'rgba(59, 130, 246, 0.1)'};
   }
   
   &:hover {
-    background-color: #f9fafb;
+    background-color: var(--background-hover);
   }
 `
 
 const DatePickerPopover = styled(Popover.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 16px;
@@ -152,22 +139,24 @@ const DatePickerPopover = styled(Popover.Content)`
 
 const TextArea = styled.textarea`
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
   min-height: 80px;
   resize: vertical;
   font-family: inherit;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 `
 
 const ErrorMessage = styled.span`
-  color: #dc2626;
+  color: var(--error);
   font-size: 12px;
   margin-top: -2px;
 `
@@ -188,34 +177,34 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   transition: all 0.2s;
   
   ${props => props.$variant === 'primary' ? `
-    background-color: #3b82f6;
+    background-color: var(--accent-primary);
     color: white;
-    border: 1px solid #3b82f6;
+    border: 1px solid var(--accent-primary);
     
     &:hover:not(:disabled) {
-      background-color: #2563eb;
-      border-color: #2563eb;
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
     }
     
     &:disabled {
-      background-color: #9ca3af;
-      border-color: #9ca3af;
+      background-color: var(--text-muted);
+      border-color: var(--text-muted);
       cursor: not-allowed;
     }
   ` : `
-    background-color: white;
-    color: #374151;
-    border: 1px solid #d1d5db;
+    background-color: var(--background-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     
     &:hover {
-      background-color: #f3f4f6;
+      background-color: var(--background-hover);
     }
   `}
 `
 
 const FormTitle = styled.h2`
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 20px;
   font-weight: 700;
 `

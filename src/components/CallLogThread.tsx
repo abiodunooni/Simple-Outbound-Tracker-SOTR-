@@ -30,7 +30,7 @@ const ThreadContainer = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   padding: 40px 20px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 `;
 
@@ -38,15 +38,15 @@ const LogEntry = styled.div`
   display: flex;
   gap: 12px;
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  background: #fafafa;
+  background: var(--background-secondary);
   transition: all 0.2s;
   cursor: context-menu;
 
   &:hover {
-    background: #f5f5f5;
-    border-color: #d1d5db;
+    background: var(--background-hover);
+    border-color: var(--border-hover);
   }
 `;
 
@@ -62,17 +62,17 @@ const IconWrapper = styled.div<{ $type: string }>`
   ${(props) => {
     switch (props.$type) {
       case "email":
-        return "background-color: #fef3c7; color: #d97706;";
+        return "background-color: var(--warning); color: white;";
       case "call":
-        return "background-color: #dbeafe; color: #2563eb;";
+        return "background-color: var(--accent-primary); color: white;";
       case "whatsapp":
-        return "background-color: #dcfce7; color: #16a34a;";
+        return "background-color: var(--success); color: white;";
       case "conference-call":
-        return "background-color: #e0e7ff; color: #6366f1;";
+        return "background-color: var(--accent-primary); color: white;";
       case "physical-meeting":
-        return "background-color: #fce7f3; color: #ec4899;";
+        return "background-color: var(--accent-primary); color: white;";
       default:
-        return "background-color: #f3f4f6; color: #6b7280;";
+        return "background-color: var(--background-hover); color: var(--text-muted);";
     }
   }}
 `;
@@ -90,25 +90,25 @@ const LogHeader = styled.div`
 `;
 
 const LogCaller = styled.span`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 12px;
   margin-left: 8px;
 `;
 
 const LogType = styled.span`
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   font-size: 14px;
 `;
 
 const LogDate = styled.span`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 12px;
 `;
 
 const LogNotes = styled.p`
   margin: 0 0 8px 0;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
 `;
@@ -118,7 +118,7 @@ const LogMeta = styled.div`
   flex-wrap: wrap;
   gap: 12px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const MetaItem = styled.span`
@@ -128,8 +128,8 @@ const MetaItem = styled.span`
 `;
 
 const ContextMenuContent = styled(ContextMenu.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 4px;
@@ -142,19 +142,19 @@ const ContextMenuItem = styled(ContextMenu.Item)`
   gap: 8px;
   padding: 8px 12px;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   cursor: pointer;
   border-radius: 4px;
   outline: none;
 
   &:hover,
   &[data-highlighted] {
-    background-color: #f3f4f6;
+    background-color: var(--background-hover);
   }
 
   &[data-color="red"]:hover {
-    background-color: #fef2f2;
-    color: #dc2626;
+    background-color: var(--background-hover);
+    color: var(--error);
   }
 `;
 

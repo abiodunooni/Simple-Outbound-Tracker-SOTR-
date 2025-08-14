@@ -1,15 +1,16 @@
-import { observer } from 'mobx-react-lite'
-import styled from 'styled-components'
-import { X } from 'lucide-react'
-import type { FilterCondition } from '../types'
-import { filterConfigs, getOperatorLabel } from '../config/filterConfig'
-import { FilterValueInput } from './FilterValueInput'
+import { observer } from "mobx-react-lite";
+import styled from "styled-components";
+import { ChevronDown, X } from "lucide-react";
+import * as Select from "@radix-ui/react-select";
+import type { FilterCondition } from "../types";
+import { filterConfigs, getOperatorLabel } from "../config/filterConfig";
+import { FilterValueInput } from "./FilterValueInput";
 
 interface FilterConditionRowProps {
-  condition: FilterCondition
-  isFirst: boolean
-  onUpdate: (updates: Partial<FilterCondition>) => void
-  onRemove: () => void
+  condition: FilterCondition;
+  isFirst: boolean;
+  onUpdate: (updates: Partial<FilterCondition>) => void;
+  onRemove: () => void;
 }
 
 const ConditionRow = styled.div`
@@ -17,27 +18,27 @@ const ConditionRow = styled.div`
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background-color: #f8fafc;
-`
+  background-color: var(--background-secondary);
+`;
 
 const ConditionHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-`
+`;
 
 const AndLabel = styled.span`
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
-  background-color: #e5e7eb;
+  color: var(--text-muted);
+  background-color: var(--background-hover);
   padding: 2px 6px;
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-`
+`;
 
 const RemoveButton = styled.button`
   display: flex;
@@ -49,132 +50,208 @@ const RemoveButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-left: auto;
-  
+
   &:hover {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: var(--background-hover);
+    color: var(--error);
   }
-`
+`;
 
 const ConditionInputs = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: flex-end;
-`
-
-const Select = styled.select`
-  padding: 8px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 14px;
-  background-color: white;
-  color: #374151;
-  min-width: 120px;
-  
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`
+`;
 
 const Label = styled.label`
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 2px;
-`
+`;
 
 const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
-`
+`;
 
-export const FilterConditionRow: React.FC<FilterConditionRowProps> = observer(({
-  condition,
-  isFirst,
-  onUpdate,
-  onRemove
-}) => {
-  const handleFieldChange = (field: string) => {
-    const config = filterConfigs.find(c => c.field === field)
-    if (config) {
-      // Reset operator and value when field changes
-      onUpdate({
-        field: field as keyof import('../types').Lead,
-        dataType: config.dataType,
-        operator: config.operators[0],
-        value: '',
-        value2: undefined
-      })
-    }
+const SelectTrigger = styled(Select.Trigger)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  min-width: 120px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  const handleOperatorChange = (operator: typeof condition.operator) => {
-    const updates: Partial<FilterCondition> = { operator }
-    
-    // Reset values when operator changes
-    if (operator === 'between' || operator === 'between_dates') {
-      updates.value = ''
-      updates.value2 = ''
-    } else {
-      updates.value = ''
-      updates.value2 = undefined
-    }
-    
-    onUpdate(updates)
+  &:hover {
+    background-color: var(--background-hover);
   }
 
-  const currentConfig = filterConfigs.find(c => c.field === condition.field)
+  &[data-placeholder] {
+    color: var(--text-muted);
+  }
+`;
 
-  return (
-    <ConditionRow>
-      <ConditionHeader>
-        {!isFirst && <AndLabel>AND</AndLabel>}
-        <RemoveButton onClick={onRemove}>
-          <X size={16} />
-        </RemoveButton>
-      </ConditionHeader>
+const SelectContent = styled(Select.Content)`
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 60;
+  max-height: 200px;
+  overflow-y: auto;
+`;
 
-      <ConditionInputs>
-        <InputGroup>
-          <Label>Field</Label>
-          <Select
-            value={condition.field}
-            onChange={(e) => handleFieldChange(e.target.value)}
-          >
-            {filterConfigs.map((config) => (
-              <option key={config.field} value={config.field}>
-                {config.label}
-              </option>
-            ))}
-          </Select>
-        </InputGroup>
+const SelectItem = styled(Select.Item)`
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-radius: 4px;
+  cursor: pointer;
 
-        <InputGroup>
-          <Label>Operator</Label>
-          <Select
-            value={condition.operator}
-            onChange={(e) => handleOperatorChange(e.target.value as typeof condition.operator)}
-          >
-            {currentConfig?.operators.map((operator) => (
-              <option key={operator} value={operator}>
-                {getOperatorLabel(operator)}
-              </option>
-            ))}
-          </Select>
-        </InputGroup>
+  &:hover,
+  &[data-highlighted] {
+    background-color: var(--background-hover);
+    color: var(--accent-primary);
+    outline: none;
+  }
 
-        <FilterValueInput
-          condition={condition}
-          config={currentConfig}
-          onUpdate={onUpdate}
-        />
-      </ConditionInputs>
-    </ConditionRow>
-  )
-})
+  &[data-state="checked"] {
+    background-color: var(--background-hover);
+    color: var(--accent-primary);
+  }
+`;
+
+const SelectIcon = styled(Select.Icon)`
+  color: var(--text-muted);
+`;
+
+export const FilterConditionRow: React.FC<FilterConditionRowProps> = observer(
+  ({ condition, isFirst, onUpdate, onRemove }) => {
+    const handleFieldChange = (field: string) => {
+      const config = filterConfigs.find((c) => c.field === field);
+      if (config) {
+        // Reset operator and value when field changes
+        onUpdate({
+          field: field as keyof import("../types").Lead,
+          dataType: config.dataType,
+          operator: config.operators[0],
+          value: "",
+          value2: undefined,
+        });
+      }
+    };
+
+    const handleOperatorChange = (operator: typeof condition.operator) => {
+      const updates: Partial<FilterCondition> = { operator };
+
+      // Reset values when operator changes
+      if (operator === "between" || operator === "between_dates") {
+        updates.value = "";
+        updates.value2 = "";
+      } else {
+        updates.value = "";
+        updates.value2 = undefined;
+      }
+
+      onUpdate(updates);
+    };
+
+    const currentConfig = filterConfigs.find(
+      (c) => c.field === condition.field
+    );
+
+    return (
+      <ConditionRow>
+        <ConditionHeader>
+          {!isFirst && <AndLabel>AND</AndLabel>}
+          <RemoveButton onClick={onRemove}>
+            <X size={16} />
+          </RemoveButton>
+        </ConditionHeader>
+
+        <ConditionInputs>
+          <InputGroup>
+            <Label>Field</Label>
+            <Select.Root
+              value={condition.field}
+              onValueChange={(field) => handleFieldChange(field)}
+            >
+              <SelectTrigger>
+                <Select.Value />
+                <SelectIcon>
+                  <ChevronDown size={16} />
+                </SelectIcon>
+              </SelectTrigger>
+              <Select.Portal>
+                <SelectContent>
+                  <Select.Viewport>
+                    {filterConfigs.map((config) => (
+                      <SelectItem key={config.field} value={config.field}>
+                        <Select.ItemText>{config.label}</Select.ItemText>
+                      </SelectItem>
+                    ))}
+                  </Select.Viewport>
+                </SelectContent>
+              </Select.Portal>
+            </Select.Root>
+          </InputGroup>
+
+          <InputGroup>
+            <Label>Operator</Label>
+            <Select.Root
+              value={condition.operator}
+              onValueChange={(e) =>
+                handleOperatorChange(e as typeof condition.operator)
+              }
+            >
+              <SelectTrigger>
+                <Select.Value />
+                <SelectIcon>
+                  <ChevronDown size={16} />
+                </SelectIcon>
+              </SelectTrigger>
+              <Select.Portal>
+                <SelectContent>
+                  <Select.Viewport>
+                    {currentConfig?.operators.map((operator) => (
+                      <SelectItem key={operator} value={operator}>
+                        <Select.ItemText>
+                          {getOperatorLabel(operator)}
+                        </Select.ItemText>
+                      </SelectItem>
+                    ))}
+                  </Select.Viewport>
+                </SelectContent>
+              </Select.Portal>
+            </Select.Root>
+          </InputGroup>
+
+          <FilterValueInput
+            condition={condition}
+            config={currentConfig}
+            onUpdate={onUpdate}
+          />
+        </ConditionInputs>
+      </ConditionRow>
+    );
+  }
+);

@@ -1,10 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import {
-  Home,
   Users,
-  Phone,
-  BarChart,
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
@@ -230,10 +227,10 @@ const Navigation = () => {
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
   const navItems = [
-    { path: "/", label: "Dashboard", icon: Home },
+    // { path: "/", label: "Dashboard", icon: Home },
     { path: "/leads", label: "Leads", icon: Users },
-    { path: "/calls", label: "Call History", icon: Phone },
-    { path: "/analytics", label: "Analytics", icon: BarChart },
+    // { path: "/calls", label: "Call History", icon: Phone },
+    // { path: "/analytics", label: "Analytics", icon: BarChart },
   ];
 
   return (

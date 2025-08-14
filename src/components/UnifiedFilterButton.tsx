@@ -29,35 +29,35 @@ const FilterTrigger = styled.button<{ $hasActiveFilters?: boolean }>`
   gap: 6px;
   padding: 8px 12px;
   background-color: ${(props) =>
-    props.$hasActiveFilters ? "#eff6ff" : "white"};
+    props.$hasActiveFilters ? "var(--accent-primary)" : "var(--background-primary)"};
   border: 1px solid
-    ${(props) => (props.$hasActiveFilters ? "#3b82f6" : "#d1d5db")};
+    ${(props) => (props.$hasActiveFilters ? "var(--accent-primary)" : "var(--border-color)")};
   border-radius: 6px;
   font-size: 14px;
-  color: ${(props) => (props.$hasActiveFilters ? "#3b82f6" : "#374151")};
+  color: ${(props) => (props.$hasActiveFilters ? "white" : "var(--text-primary)")};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
+    background-color: ${(props) => (props.$hasActiveFilters ? "var(--accent-hover)" : "var(--background-hover)")};
+    border-color: var(--border-hover);
   }
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
   &[data-state="open"] {
-    background-color: #eff6ff;
-    border-color: #3b82f6;
-    color: #3b82f6;
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
   }
 `;
 
 const FilterCount = styled.span`
-  background-color: #3b82f6;
+  background-color: var(--accent-primary);
   color: white;
   border-radius: 10px;
   padding: 2px 6px;
@@ -74,8 +74,8 @@ const Container = styled.div`
 `;
 
 const PopoverContent = styled(Popover.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 16px;
@@ -89,8 +89,8 @@ const PopoverContent = styled(Popover.Content)`
 `;
 
 const PopoverArrow = styled(Popover.Arrow)`
-  fill: white;
-  stroke: #e2e8f0;
+  fill: var(--background-primary);
+  stroke: var(--border-color);
   stroke-width: 1;
 `;
 
@@ -100,14 +100,14 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 `;
 
 const Title = styled.h3`
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
 `;
 
 const HeaderActions = styled.div`
@@ -131,34 +131,33 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
     switch (props.$variant) {
       case 'primary':
         return `
-          background-color: #3b82f6;
+          background-color: var(--accent-primary);
           color: white;
-          border-color: #3b82f6;
+          border-color: var(--accent-primary);
           
           &:hover {
-            background-color: #2563eb;
-            border-color: #2563eb;
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
           }
         `;
       case 'danger':
         return `
-          background-color: #dc2626;
+          background-color: var(--error);
           color: white;
-          border-color: #dc2626;
+          border-color: var(--error);
           
           &:hover {
-            background-color: #b91c1c;
-            border-color: #b91c1c;
+            opacity: 0.9;
           }
         `;
       default:
         return `
-          background-color: white;
-          color: #374151;
-          border-color: #d1d5db;
+          background-color: var(--background-primary);
+          color: var(--text-secondary);
+          border-color: var(--border-color);
           
           &:hover {
-            background-color: #f3f4f6;
+            background-color: var(--background-hover);
           }
         `;
     }
@@ -175,10 +174,10 @@ const FiltersContainer = styled.div`
 
 const EmptyState = styled.div`
   text-align: center;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
   padding: 24px;
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--border-color);
   border-radius: 6px;
 `;
 
@@ -187,12 +186,12 @@ const Footer = styled.div`
   justify-content: flex-end;
   gap: 8px;
   padding-top: 12px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color);
 `;
 
 const ResultCount = styled.div`
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 8px;
 `;
 

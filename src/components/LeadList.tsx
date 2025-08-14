@@ -35,18 +35,18 @@ const Table = styled.table`
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background-color: white;
-  border: 1px solid #e2e8f0;
+  background-color: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
 `;
 
 const TableHeader = styled.thead`
-  background-color: #e5e7eb;
+  background-color: var(--background-secondary);
 `;
 
 const TableRow = styled.tr`
   &:hover {
-    background-color: #f9fafb;
+    background-color: var(--background-hover);
   }
 
   &:last-child {
@@ -64,7 +64,7 @@ const TableHeaderCell = styled.th<{ $sortable?: boolean }>`
   padding: 12px 16px;
   text-align: left;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 14px;
   cursor: ${(props) => (props.$sortable ? "pointer" : "default")};
 
@@ -77,15 +77,15 @@ const TableHeaderCell = styled.th<{ $sortable?: boolean }>`
   }
 
   &:hover {
-    color: ${(props) => (props.$sortable ? "#1f2937" : "#374151")};
+    color: ${(props) => (props.$sortable ? "var(--text-primary)" : "var(--text-secondary)")};
   }
 `;
 
 const TableCell = styled.td`
   padding: 12px 16px;
-  color: #4b5563;
+  color: var(--text-secondary);
   font-size: 14px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 
   tr:last-child & {
     border-bottom: none;
@@ -95,7 +95,7 @@ const TableCell = styled.td`
 const EmptyState = styled.div`
   text-align: center;
   padding: 48px 16px;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const CheckboxWrapper = styled.div`
@@ -106,27 +106,27 @@ const CheckboxWrapper = styled.div`
 
 const CustomCheckbox = styled(Checkbox.Root)`
   all: unset;
-  background-color: white;
+  background-color: var(--background-primary);
   width: 18px;
   height: 18px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   cursor: pointer;
 
   &:hover {
-    border-color: #9ca3af;
+    border-color: var(--border-hover);
   }
 
   &[data-state="checked"] {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
   }
 
   &:focus {
-    outline: 2px solid #93c5fd;
+    outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
   }
 `;
@@ -147,11 +147,11 @@ const CheckboxIndicator = styled(Checkbox.Indicator)`
 
 const ContextMenuContent = styled(ContextMenu.Content)`
   min-width: 150px;
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 6px;
   padding: 4px;
   box-shadow: 0 10px 38px -10px rgba(22, 23, 24, 0.35), 0 10px 20px -15px rgba(22, 23, 24, 0.2);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   z-index: 100;
 `;
 
@@ -159,7 +159,7 @@ const ContextMenuItem = styled(ContextMenu.Item)`
   all: unset;
   font-size: 14px;
   line-height: 1;
-  color: #374151;
+  color: var(--text-secondary);
   border-radius: 3px;
   display: flex;
   align-items: center;
@@ -170,17 +170,17 @@ const ContextMenuItem = styled(ContextMenu.Item)`
   cursor: pointer;
 
   &:hover {
-    background-color: #f3f4f6;
-    color: #111827;
+    background-color: var(--background-hover);
+    color: var(--text-primary);
   }
 
   &[data-highlighted] {
-    background-color: #f3f4f6;
-    color: #111827;
+    background-color: var(--background-hover);
+    color: var(--text-primary);
   }
 
   &[data-disabled] {
-    color: #9ca3af;
+    color: var(--text-muted);
     pointer-events: none;
   }
 
@@ -199,7 +199,7 @@ const DialogOverlay = styled(Dialog.Overlay)`
 `;
 
 const DialogContent = styled(Dialog.Content)`
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 6px;
   box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
   position: fixed;
@@ -216,14 +216,14 @@ const DialogContent = styled(Dialog.Content)`
 const DialogTitle = styled(Dialog.Title)`
   margin: 0;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   font-size: 18px;
   margin-bottom: 16px;
 `;
 
 const DialogDescription = styled(Dialog.Description)`
   margin: 0 0 20px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
 `;
@@ -250,29 +250,29 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' }>`
     switch (props.variant) {
       case 'danger':
         return `
-          background-color: #dc2626;
-          border-color: #dc2626;
+          background-color: var(--error);
+          border-color: var(--error);
           color: white;
           &:hover {
-            background-color: #b91c1c;
+            opacity: 0.9;
           }
         `;
       case 'primary':
         return `
-          background-color: #3b82f6;
-          border-color: #3b82f6;
+          background-color: var(--accent-primary);
+          border-color: var(--accent-primary);
           color: white;
           &:hover {
-            background-color: #2563eb;
+            background-color: var(--accent-hover);
           }
         `;
       default:
         return `
-          background-color: white;
-          border-color: #d1d5db;
-          color: #374151;
+          background-color: var(--background-primary);
+          border-color: var(--border-color);
+          color: var(--text-secondary);
           &:hover {
-            background-color: #f9fafb;
+            background-color: var(--background-hover);
           }
         `;
     }
@@ -448,7 +448,7 @@ export const LeadList: React.FC<LeadListProps> = observer(
                       </TableCell>
                       <TableCell>
                         <span
-                          style={{ cursor: "pointer", color: "#3b82f6" }}
+                          style={{ cursor: "pointer", color: "var(--accent-primary)" }}
                           onClick={() => {
                             if (onLeadSelect) {
                               onLeadSelect(lead);

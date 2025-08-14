@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import * as Select from '@radix-ui/react-select'
@@ -23,21 +24,22 @@ const InputGroup = styled.div`
 const Label = styled.label`
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 2px;
 `
 
 const Input = styled.input`
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
+  background-color: var(--background-primary);
   min-width: 120px;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 `
@@ -47,32 +49,32 @@ const SelectTrigger = styled(Select.Trigger)`
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
-  background-color: white;
-  color: #374151;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   min-width: 150px;
   cursor: pointer;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
   &:hover {
-    background-color: #f9fafb;
+    background-color: var(--background-hover);
   }
   
   &[data-placeholder] {
-    color: #9ca3af;
+    color: var(--text-muted);
   }
 `;
 
 const SelectContent = styled(Select.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 4px;
@@ -86,24 +88,24 @@ const SelectItem = styled(Select.Item)`
   align-items: center;
   padding: 8px 12px;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   border-radius: 4px;
   cursor: pointer;
   
   &:hover, &[data-highlighted] {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--background-hover);
+    color: var(--accent-primary);
     outline: none;
   }
   
   &[data-state="checked"] {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--background-hover);
+    color: var(--accent-primary);
   }
 `;
 
 const SelectIcon = styled(Select.Icon)`
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const DateButton = styled.button`
@@ -111,29 +113,29 @@ const DateButton = styled.button`
   align-items: center;
   gap: 6px;
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
-  background-color: white;
-  color: #374151;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   cursor: pointer;
   min-width: 150px;
   text-align: left;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
   &:hover {
-    background-color: #f9fafb;
+    background-color: var(--background-hover);
   }
 `;
 
 const DatePickerPopover = styled(Popover.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 16px;
@@ -146,15 +148,20 @@ const DatePickerPopover = styled(Popover.Content)`
   .rdp-caption_label {
     font-size: 16px;
     font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .rdp-day {
+    color: var(--text-primary);
   }
   
   .rdp-day_selected {
-    background-color: #3b82f6;
+    background-color: var(--accent-primary);
     color: white;
   }
   
   .rdp-day:hover:not(.rdp-day_selected) {
-    background-color: #eff6ff;
+    background-color: var(--background-hover);
   }
 `;
 
@@ -164,10 +171,10 @@ const MultiSelectContainer = styled.div`
   gap: 4px;
   max-height: 120px;
   overflow-y: auto;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 8px;
-  background-color: white;
+  background-color: var(--background-primary);
   min-width: 150px;
 `;
 
@@ -178,27 +185,28 @@ const CheckboxItem = styled.div`
   padding: 4px;
   border-radius: 4px;
   cursor: pointer;
+  color: var(--text-primary);
   
   &:hover {
-    background-color: #f3f4f6;
+    background-color: var(--background-hover);
   }
 `;
 
 const CheckboxRoot = styled(Checkbox.Root)`
   width: 16px;
   height: 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 3px;
-  background-color: white;
+  background-color: var(--background-primary);
   cursor: pointer;
   
   &:hover {
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
   }
   
   &[data-state="checked"] {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
   }
 `;
 

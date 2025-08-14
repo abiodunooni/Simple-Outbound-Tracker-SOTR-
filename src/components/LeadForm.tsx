@@ -20,7 +20,7 @@ const Form = styled.form`
   width: 600px;
   max-width: 90vw;
   padding: 24px;
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
@@ -39,19 +39,21 @@ const FormRow = styled.div`
 
 const Label = styled.label`
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   font-size: 14px;
 `;
 
 const Input = styled.input<{ $hasError?: boolean }>`
   padding: 10px 12px;
-  border: 1px solid ${(props) => (props.$hasError ? "#dc2626" : "#d1d5db")};
+  border: 1px solid ${(props) => (props.$hasError ? "var(--error)" : "var(--border-color)")};
   border-radius: 6px;
   font-size: 14px;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
 
   &:focus {
     outline: none;
-    border-color: ${(props) => (props.$hasError ? "#dc2626" : "#3b82f6")};
+    border-color: ${(props) => (props.$hasError ? "var(--error)" : "var(--accent-primary)")};
     box-shadow: 0 0 0 3px
       ${(props) =>
         props.$hasError ? "rgba(220, 38, 38, 0.1)" : "rgba(59, 130, 246, 0.1)"};
@@ -59,7 +61,7 @@ const Input = styled.input<{ $hasError?: boolean }>`
 `;
 
 const ErrorMessage = styled.span`
-  color: #dc2626;
+  color: var(--error);
   font-size: 12px;
   margin-top: -2px;
 `;
@@ -80,7 +82,7 @@ const ToggleGroup = styled.div`
 
 const ToggleLabel = styled.label`
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -109,35 +111,35 @@ const Button = styled.button<{ $variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.$variant === "primary"
       ? `
-    background-color: #3b82f6;
+    background-color: var(--accent-primary);
     color: white;
-    border: 1px solid #3b82f6;
+    border: 1px solid var(--accent-primary);
     
     &:hover:not(:disabled) {
-      background-color: #2563eb;
-      border-color: #2563eb;
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
     }
     
     &:disabled {
-      background-color: #9ca3af;
-      border-color: #9ca3af;
+      background-color: var(--text-muted);
+      border-color: var(--text-muted);
       cursor: not-allowed;
     }
   `
       : `
-    background-color: white;
-    color: #374151;
-    border: 1px solid #d1d5db;
+    background-color: var(--background-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     
     &:hover {
-      background-color: #f3f4f6;
+      background-color: var(--background-hover);
     }
   `}
 `;
 
 const FormTitle = styled.h2`
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 20px;
   font-weight: 700;
 `;
@@ -147,28 +149,28 @@ const SelectTrigger = styled(Select.Trigger)`
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
-  background-color: white;
-  color: #374151;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   cursor: pointer;
   min-width: 150px;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
   &[data-placeholder] {
-    color: #9ca3af;
+    color: var(--text-muted);
   }
 `;
 
 const SelectContent = styled(Select.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 4px;
@@ -180,23 +182,23 @@ const SelectItem = styled(Select.Item)`
   align-items: center;
   padding: 8px 12px;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   cursor: pointer;
   border-radius: 4px;
   outline: none;
   
   &:hover, &[data-highlighted] {
-    background-color: #f3f4f6;
+    background-color: var(--background-hover);
   }
   
   &[data-state="checked"] {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--background-hover);
+    color: var(--accent-primary);
   }
 `;
 
 const SelectIcon = styled(Select.Icon)`
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const ProductsContainer = styled.div`
@@ -211,14 +213,14 @@ const ProductTag = styled.span`
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background-color: #eff6ff;
-  color: #2563eb;
+  background-color: var(--background-secondary);
+  color: var(--accent-primary);
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
   
   &:hover {
-    background-color: #dbeafe;
+    background-color: var(--background-hover);
   }
 `;
 
@@ -560,8 +562,8 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
             <Select.Root 
               value={""} 
               onValueChange={(value) => {
-                if (!formData.products.includes(value as Product)) {
-                  handleInputChange("products", [...formData.products, value as Product]);
+                if (!formData.products?.includes(value as Product)) {
+                  handleInputChange("products", [...(formData.products || []), value as Product]);
                 }
               }}
             >
@@ -595,7 +597,7 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
                 <ProductTag 
                   key={product}
                   onClick={() => {
-                    handleInputChange("products", formData.products.filter(p => p !== product));
+                    handleInputChange("products", (formData.products || []).filter(p => p !== product));
                   }}
                 >
                   {product} ×

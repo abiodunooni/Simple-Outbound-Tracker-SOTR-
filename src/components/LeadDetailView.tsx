@@ -25,7 +25,7 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   padding: 24px;
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 8px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 `;
@@ -36,14 +36,14 @@ const LeadInfo = styled.div`
 
 const LeadName = styled.h1`
   margin: 0 0 8px 0;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 28px;
   font-weight: 700;
 `;
 
 const LeadCompany = styled.h2`
   margin: 0 0 16px 0;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 20px;
   font-weight: 500;
 `;
@@ -61,16 +61,16 @@ const LeadMetrics = styled.div`
   gap: 12px 24px;
   margin-bottom: 16px;
   padding: 16px;
-  background-color: #f8fafc;
+  background-color: var(--background-secondary);
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
 `;
 
 const ContactItem = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #4b5563;
+  color: var(--text-secondary);
   font-size: 14px;
 `;
 
@@ -82,20 +82,20 @@ const ContactLabel = styled.span`
 const Notes = styled.div`
   margin-top: 16px;
   padding: 12px;
-  background-color: #f8fafc;
+  background-color: var(--background-secondary);
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
 `;
 
 const NotesLabel = styled.div`
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   margin-bottom: 8px;
   font-size: 14px;
 `;
 
 const NotesText = styled.div`
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   white-space: pre-wrap;
 `;
@@ -116,28 +116,28 @@ const Button = styled.button<{ $variant?: "primary" | "secondary" }>`
   ${(props) =>
     props.$variant === "primary"
       ? `
-    background-color: #3b82f6;
+    background-color: var(--accent-primary);
     color: white;
-    border: 1px solid #3b82f6;
+    border: 1px solid var(--accent-primary);
     
     &:hover {
-      background-color: #2563eb;
-      border-color: #2563eb;
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
     }
   `
       : `
-    background-color: white;
-    color: #374151;
-    border: 1px solid #d1d5db;
+    background-color: var(--background-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     
     &:hover {
-      background-color: #f3f4f6;
+      background-color: var(--background-hover);
     }
   `}
 `;
 
 const Section = styled.div`
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 8px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -148,13 +148,13 @@ const SectionHeader = styled.div`
   justify-content: between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #f8fafc;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--background-secondary);
 `;
 
 const SectionTitle = styled.h3`
   margin: 0;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
   flex: 1;
@@ -167,7 +167,7 @@ const CallHistoryList = styled.div`
 
 const CallHistoryItem = styled.div`
   padding: 16px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 
   &:last-child {
     border-bottom: none;
@@ -215,7 +215,7 @@ const CallType = styled.span<{ $type: string }>`
 `;
 
 const CallDate = styled.span`
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 `;
 
@@ -224,7 +224,7 @@ const CallDetails = styled.div`
   gap: 16px;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #4b5563;
+  color: var(--text-secondary);
 `;
 
 const CallOutcome = styled.span<{ $outcome: string }>`
@@ -246,7 +246,7 @@ const CallOutcome = styled.span<{ $outcome: string }>`
 `;
 
 const CallNotes = styled.div`
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   margin-top: 8px;
 `;
@@ -254,7 +254,7 @@ const CallNotes = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   padding: 48px 24px;
-  color: #6b7280;
+  color: var(--text-muted);
 `;
 
 const Modal = styled.div`

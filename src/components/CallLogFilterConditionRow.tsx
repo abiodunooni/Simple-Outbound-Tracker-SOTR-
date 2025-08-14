@@ -18,9 +18,9 @@ const ConditionRow = styled.div`
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background-color: #f8fafc;
+  background-color: var(--background-secondary);
 `
 
 const ConditionHeader = styled.div`
@@ -32,8 +32,8 @@ const ConditionHeader = styled.div`
 const AndLabel = styled.span`
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
-  background-color: #e5e7eb;
+  color: var(--text-muted);
+  background-color: var(--background-hover);
   padding: 2px 6px;
   border-radius: 4px;
   text-transform: uppercase;
@@ -50,12 +50,12 @@ const RemoveButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-left: auto;
   
   &:hover {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: var(--background-hover);
+    color: var(--error);
   }
 `
 
@@ -71,32 +71,32 @@ const SelectTrigger = styled(Select.Trigger)`
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
-  background-color: white;
-  color: #374151;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   min-width: 120px;
   cursor: pointer;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
   &:hover {
-    background-color: #f9fafb;
+    background-color: var(--background-hover);
   }
   
   &[data-placeholder] {
-    color: #9ca3af;
+    color: var(--text-muted);
   }
 `;
 
 const SelectContent = styled(Select.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 4px;
@@ -110,32 +110,32 @@ const SelectItem = styled(Select.Item)`
   align-items: center;
   padding: 8px 12px;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   border-radius: 4px;
   cursor: pointer;
   
   &:hover, &[data-highlighted] {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--background-hover);
+    color: var(--accent-primary);
     outline: none;
   }
   
   &[data-state="checked"] {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--background-hover);
+    color: var(--accent-primary);
   }
 `;
 
 const SelectIcon = styled(Select.Icon)`
-  color: #6b7280;
-`
+  color: var(--text-muted);
+`;
 
 const Label = styled.label`
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 2px;
-`
+`;
 
 const InputGroup = styled.div`
   display: flex;

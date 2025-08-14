@@ -44,7 +44,11 @@ export class CallLogStore {
     }
   }
 
-  addCallLog(callLogData: Omit<CallLog, "id">): { success: boolean; callLog?: CallLog; error?: string } {
+  addCallLog(callLogData: Omit<CallLog, "id">): {
+    success: boolean;
+    callLog?: CallLog;
+    error?: string;
+  } {
     try {
       const newCallLog: CallLog = {
         ...callLogData,
@@ -56,13 +60,17 @@ export class CallLogStore {
 
       // Update lead status and last contacted date
       if (this.leadStore) {
-        this.leadStore.updateLastContacted(newCallLog.leadId, new Date(newCallLog.date));
+        this.leadStore.updateLastContacted(
+          newCallLog.leadId,
+          new Date(newCallLog.date)
+        );
         this.leadStore.updateLeadStatus(newCallLog.leadId, this.callLogs);
       }
 
       return { success: true, callLog: newCallLog };
     } catch (error) {
-      return { success: false, error: 'Failed to add call log' };
+      console.log({ error });
+      return { success: false, error: "Failed to add call log" };
     }
   }
 
@@ -92,11 +100,11 @@ export class CallLogStore {
     return this.callLogs.find((log) => log.id === id);
   }
 
-  getCallLogsByLeadId(leadId: string): CallLog[] {
-    return this.callLogs
-      .filter((log) => log.leadId === leadId)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }
+  // getCallLogsByLeadId(leadId: string): CallLog[] {
+  //   return this.callLogs
+  //     .filter((log) => log.leadId === leadId)
+  //     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // }
 
   setTypeFilter(type: CallLogType | "all"): void {
     this.typeFilter = type;
@@ -129,8 +137,10 @@ export class CallLogStore {
 
     // Apply sorting
     filtered.slice().sort((a, b) => {
-      let aValue: number | Date = this.sortBy === "date" ? a.date : a.duration;
-      let bValue: number | Date = this.sortBy === "date" ? b.date : b.duration;
+      let aValue: number | Date =
+        this.sortBy === "date" ? a.date : a.duration || 0;
+      let bValue: number | Date =
+        this.sortBy === "date" ? b.date : b.duration || 0;
 
       if (aValue instanceof Date && bValue instanceof Date) {
         aValue = aValue.getTime();
@@ -146,7 +156,7 @@ export class CallLogStore {
   }
 
   getCallLogsByLeadId(leadId: string): CallLog[] {
-    return this.callLogs.filter(log => log.leadId === leadId);
+    return this.callLogs.filter((log) => log.leadId === leadId);
   }
 
   get totalCallLogs(): number {

@@ -37,19 +37,19 @@ const Title = styled.h1`
   margin: 0;
   font-size: 32px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-primary);
 `;
 
 const Subtitle = styled.p`
   margin: 0;
   font-size: 16px;
-  color: #6b7280;
+  color: var(--text-secondary);
 `;
 
 const Divider = styled.hr`
   border: none;
   height: 1px;
-  background-color: #e5e7eb;
+  background-color: var(--border-color);
   margin: 0;
 `;
 
@@ -74,19 +74,21 @@ const SearchAndSortGroup = styled.div`
 
 const SearchInput = styled.input`
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
   width: 300px;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--text-muted);
   }
 `;
 
@@ -95,29 +97,29 @@ const SortButton = styled.button<{ $hasActiveSort?: boolean }>`
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background-color: ${(props) => (props.$hasActiveSort ? "#eff6ff" : "white")};
-  border: 1px solid ${(props) => (props.$hasActiveSort ? "#3b82f6" : "#d1d5db")};
+  background-color: ${(props) => (props.$hasActiveSort ? "var(--accent-primary)" : "var(--background-primary)")};
+  border: 1px solid ${(props) => (props.$hasActiveSort ? "var(--accent-primary)" : "var(--border-color)")};
   border-radius: 6px;
   font-size: 14px;
-  color: ${(props) => (props.$hasActiveSort ? "#3b82f6" : "#374151")};
+  color: ${(props) => (props.$hasActiveSort ? "white" : "var(--text-primary)")};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
+    background-color: ${(props) => (props.$hasActiveSort ? "var(--accent-hover)" : "var(--background-hover)")};
+    border-color: var(--border-hover);
   }
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 `;
 
 const DropdownContent = styled(DropdownMenu.Content)`
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   padding: 4px;
@@ -131,25 +133,25 @@ const DropdownItem = styled(DropdownMenu.Item)<{ $isActive?: boolean }>`
   justify-content: space-between;
   padding: 8px 12px;
   font-size: 14px;
-  color: ${(props) => (props.$isActive ? "#3b82f6" : "#374151")};
-  background-color: ${(props) => (props.$isActive ? "#eff6ff" : "transparent")};
+  color: ${(props) => (props.$isActive ? "var(--accent-primary)" : "var(--text-primary)")};
+  background-color: ${(props) => (props.$isActive ? "var(--background-secondary)" : "transparent")};
   border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-    background-color: ${(props) => (props.$isActive ? "#dbeafe" : "#f3f4f6")};
+    background-color: var(--background-hover);
     outline: none;
   }
 
   &:focus {
-    background-color: ${(props) => (props.$isActive ? "#dbeafe" : "#f3f4f6")};
+    background-color: var(--background-hover);
     outline: none;
   }
 `;
 
 const DropdownSeparator = styled(DropdownMenu.Separator)`
   height: 1px;
-  background-color: #e2e8f0;
+  background-color: var(--border-color);
   margin: 4px 0;
 `;
 
@@ -160,10 +162,10 @@ const SortOptionGroup = styled.div`
 `;
 
 const ClearSortItem = styled(DropdownItem)`
-  color: #dc2626;
+  color: var(--error);
 
   &:hover {
-    background-color: #fef2f2;
+    background-color: var(--background-hover);
   }
 `;
 
@@ -182,24 +184,23 @@ const Button = styled.button<{ variant?: "primary" | "danger" }>`
   ${(props) => {
     if (props.variant === "danger") {
       return `
-        background-color: #dc2626;
+        background-color: var(--error);
         color: white;
-        border-color: #dc2626;
+        border-color: var(--error);
         
         &:hover {
-          background-color: #b91c1c;
-          border-color: #b91c1c;
+          opacity: 0.9;
         }
       `;
     }
     return `
-      background-color: #3b82f6;
+      background-color: var(--accent-primary);
       color: white;
-      border-color: #3b82f6;
+      border-color: var(--accent-primary);
       
       &:hover {
-        background-color: #2563eb;
-        border-color: #2563eb;
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
       }
     `;
   }}
@@ -213,7 +214,7 @@ const DialogOverlay = styled(Dialog.Overlay)`
 `;
 
 const DialogContent = styled(Dialog.Content)`
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 6px;
   box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
     hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
@@ -231,14 +232,14 @@ const DialogContent = styled(Dialog.Content)`
 const DialogTitle = styled(Dialog.Title)`
   margin: 0;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   font-size: 18px;
   margin-bottom: 16px;
 `;
 
 const DialogDescription = styled(Dialog.Description)`
   margin: 0 0 20px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
 `;
@@ -400,7 +401,7 @@ export const Leads: React.FC = observer(() => {
                       style={{
                         fontSize: "12px",
                         fontWeight: "600",
-                        color: "#6b7280",
+                        color: "var(--text-muted)",
                       }}
                     >
                       Toggle Column Visibility
@@ -420,8 +421,8 @@ export const Leads: React.FC = observer(() => {
                         <span
                           style={{
                             color: visibleColumns[column.key]
-                              ? "#10b981"
-                              : "#6b7280",
+                              ? "var(--success)"
+                              : "var(--text-muted)",
                           }}
                         >
                           {visibleColumns[column.key] ? "✓" : "○"}

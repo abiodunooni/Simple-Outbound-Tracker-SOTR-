@@ -15,8 +15,8 @@ function App() {
       <SidebarProvider>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="leads" element={<Leads />} />
+            <Route index path="leads" element={<Leads />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="leads/:id" element={<LeadDetail />} />
             <Route path="calls" element={<CallHistory />} />
             <Route path="analytics" element={<Analytics />} />

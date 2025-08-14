@@ -181,9 +181,9 @@ const CallType = styled.span<{ $type: CallLogType }>`
     switch (props.$type) {
       case "call":
         return "#dbeafe";
-      case "meeting":
+      case "physical-meeting":
         return "#dcfce7";
-      case "follow-up":
+      case "conference-call":
         return "#fef3c7";
       default:
         return "#f3f4f6";
@@ -193,9 +193,9 @@ const CallType = styled.span<{ $type: CallLogType }>`
     switch (props.$type) {
       case "call":
         return "#1d4ed8";
-      case "meeting":
+      case "physical-meeting":
         return "#166534";
-      case "follow-up":
+      case "conference-call":
         return "#d97706";
       default:
         return "#374151";
@@ -318,10 +318,10 @@ export const CallHistory: React.FC = observer(() => {
         lead?.company || "",
         callLog.type,
         new Date(callLog.date).toISOString(),
-        callLog.duration.toString(),
+        (callLog.duration ?? 0).toString(),
         callLog.outcome,
         callLog.notes.replace(/"/g, '""'), // Escape quotes
-        callLog.nextAction.replace(/"/g, '""'),
+        (callLog.nextAction ?? "").replace(/"/g, '""'),
       ];
     });
 
@@ -350,7 +350,7 @@ export const CallHistory: React.FC = observer(() => {
   const callsThisWeek = callLogStore.callsThisWeek.length;
   const avgCallsPerDay = callLogStore.averageCallsPerDay;
 
-  const totalDuration = callLogs.reduce((sum, call) => sum + call.duration, 0);
+  const totalDuration = callLogs.reduce((sum, call) => sum + (call.duration ?? 0), 0);
   const avgDuration =
     callLogs.length > 0 ? Math.round(totalDuration / callLogs.length) : 0;
 
@@ -477,8 +477,8 @@ export const CallHistory: React.FC = observer(() => {
                         <span>•</span>
                         <span>{callLog.duration} min</span>
                         <span>•</span>
-                        <CallOutcomeSpan $outcome={callLog.outcome}>
-                          {formatOutcome(callLog.outcome)}
+                        <CallOutcomeSpan $outcome={callLog.outcome ?? "connected"}>
+                          {formatOutcome(callLog.outcome ?? "connected")}
                         </CallOutcomeSpan>
                       </CallMeta>
                     </LeadInfo>

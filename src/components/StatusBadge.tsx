@@ -19,10 +19,10 @@ const Badge = styled.span<{ $status: LeadStatus; $size: 'small' | 'medium' | 'la
   text-transform: capitalize;
   color: ${props => {
     switch (props.$status) {
-      case 'Hot': return '#dc2626'
-      case 'Warm': return '#d97706'
-      case 'Cold': return '#0284c7'
-      default: return '#374151'
+      case 'Hot': return 'var(--error)'
+      case 'Warm': return 'var(--warning)'
+      case 'Cold': return 'var(--accent-primary)'
+      default: return 'var(--text-primary)'
     }
   }};
 `
