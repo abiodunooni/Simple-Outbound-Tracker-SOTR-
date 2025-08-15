@@ -15,6 +15,7 @@ import {
   ArrowUp,
   ArrowDown,
   X,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "../hooks/useStore";
@@ -253,6 +254,30 @@ const FieldValue = styled.span`
   font-weight: 500;
 `;
 
+const CompanyLink = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  color: var(--accent-primary);
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  
+  &:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
+  
+  &:focus {
+    outline: none;
+    color: var(--accent-hover);
+  }
+`;
+
 const LogCallButton = styled.button`
   display: flex;
   align-items: center;
@@ -375,7 +400,7 @@ const formatDate = (date: Date | null) => {
 export const LeadDetail: React.FC = observer(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { leadStore, callLogStore } = useStore();
+  const { leadStore, callLogStore, companyStore } = useStore();
   const [lead, setLead] = useState<Lead | null>(null);
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
   const [callLogModalOpen, setCallLogModalOpen] = useState(false);
@@ -589,6 +614,28 @@ export const LeadDetail: React.FC = observer(() => {
     return currentOption?.label || "Date";
   };
 
+  const findAssociatedCompany = () => {
+    if (!lead) return null;
+    
+    // First try to find by companyId
+    if (lead.companyId) {
+      const company = companyStore.getCompanyById(lead.companyId);
+      if (company) return company;
+    }
+    
+    // Fallback to finding by company name
+    return companyStore.companies.find(
+      company => company.name.toLowerCase() === lead.company.toLowerCase()
+    );
+  };
+
+  const handleNavigateToCompany = () => {
+    const company = findAssociatedCompany();
+    if (company) {
+      navigate(`/companies/${company.id}`);
+    }
+  };
+
   if (!lead) {
     return <div>Loading...</div>;
   }
@@ -601,7 +648,15 @@ export const LeadDetail: React.FC = observer(() => {
         </BackButton>
         <LeadHeader>
           <PageTitle>
-            {lead.name} from {lead.company}
+            {lead.name} from{" "}
+            {findAssociatedCompany() ? (
+              <CompanyLink onClick={handleNavigateToCompany}>
+                {lead.company}
+                <ExternalLink size={16} />
+              </CompanyLink>
+            ) : (
+              lead.company
+            )}
           </PageTitle>
         </LeadHeader>
         <div style={{ display: "flex", gap: "8px" }}>
@@ -625,6 +680,18 @@ export const LeadDetail: React.FC = observer(() => {
       <Content>
         <ContactSection>
           <DetailGrid>
+            <DetailField>
+              <FieldLabel>Company</FieldLabel>
+              {findAssociatedCompany() ? (
+                <CompanyLink onClick={handleNavigateToCompany}>
+                  {lead.company}
+                  <ExternalLink size={14} />
+                </CompanyLink>
+              ) : (
+                <FieldValue>{lead.company}</FieldValue>
+              )}
+            </DetailField>
+
             <DetailField>
               <FieldLabel>Email</FieldLabel>
               <FieldValue>{lead.email || "Not provided"}</FieldValue>

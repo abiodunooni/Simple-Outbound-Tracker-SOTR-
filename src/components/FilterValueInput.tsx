@@ -190,14 +190,14 @@ export const FilterValueInput: React.FC<FilterValueInputProps> = observer(({
     }
   }
 
-  const handleMultiSelectChange = (optionValue: any, checked: boolean) => {
+  const handleMultiSelectChange = (optionValue: string, checked: boolean) => {
     const currentValues = Array.isArray(condition.value) ? condition.value : []
     let newValues
     
     if (checked) {
       newValues = [...currentValues, optionValue]
     } else {
-      newValues = currentValues.filter((v: any) => v !== optionValue)
+      newValues = currentValues.filter((v: string) => v !== optionValue)
     }
     
     onUpdate({ value: newValues })

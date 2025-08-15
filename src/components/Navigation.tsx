@@ -2,8 +2,11 @@ import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import {
   Users,
+  Building2,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
+  Target,
 } from "lucide-react";
 import React, { useCallback } from "react";
 import { useSidebar } from "../context/SidebarContext";
@@ -93,7 +96,51 @@ const NavItem = styled.li`
   margin-bottom: 2px;
 `;
 
-const NavLink = styled(Link)<{ $active: boolean }>`
+
+const NavIcon = styled.span`
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const SubNavList = styled.ul<{ $isOpen: boolean }>`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: ${(props) => (props.$isOpen ? "200px" : "0")};
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+`;
+
+const SubNavItem = styled.li`
+  margin-bottom: 1px;
+`;
+
+const SubNavLink = styled(Link)<{ $active: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px 10px 56px;
+  margin: 0 16px;
+  text-decoration: none;
+  color: ${(props) =>
+    props.$active ? "var(--text-primary)" : "var(--text-secondary)"};
+  font-weight: ${(props) => (props.$active ? "600" : "400")};
+  font-size: 13px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  background: ${(props) =>
+    props.$active ? "var(--background-hover)" : "transparent"};
+
+  &:hover {
+    background: var(--background-hover);
+    color: var(--text-primary);
+  }
+`;
+
+const NavButton = styled.button<{ $active: boolean; $hasChildren: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -108,6 +155,11 @@ const NavLink = styled(Link)<{ $active: boolean }>`
   transition: all 0.2s ease;
   background: ${(props) =>
     props.$active ? "var(--background-hover)" : "transparent"};
+  border: none;
+  width: calc(100% - 32px);
+  cursor: pointer;
+  justify-content: ${(props) =>
+    props.$hasChildren ? "space-between" : "flex-start"};
 
   &:hover {
     background: var(--background-hover);
@@ -115,9 +167,9 @@ const NavLink = styled(Link)<{ $active: boolean }>`
   }
 `;
 
-const NavIcon = styled.span`
-  width: 20px;
-  height: 20px;
+const ChevronIcon = styled.span<{ $isOpen: boolean }>`
+  transition: transform 0.2s ease;
+  transform: ${(props) => (props.$isOpen ? "rotate(180deg)" : "rotate(0deg)")};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,6 +231,9 @@ const Navigation = () => {
     setIsPinned,
   } = useSidebar();
   const [isResizing, setIsResizing] = React.useState(false);
+  const [isProspectsOpen, setIsProspectsOpen] = React.useState(
+    location.pathname === "/leads" || location.pathname === "/companies"
+  );
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -226,12 +281,18 @@ const Navigation = () => {
     }
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
-  const navItems = [
-    // { path: "/", label: "Dashboard", icon: Home },
+  const prospectsSubItems = [
     { path: "/leads", label: "Leads", icon: Users },
-    // { path: "/calls", label: "Call History", icon: Phone },
-    // { path: "/analytics", label: "Analytics", icon: BarChart },
+    { path: "/companies", label: "Companies", icon: Building2 },
   ];
+
+  const isProspectsActive = location.pathname === "/leads" || location.pathname === "/companies";
+
+  React.useEffect(() => {
+    if (isProspectsActive && !isProspectsOpen) {
+      setIsProspectsOpen(true);
+    }
+  }, [isProspectsActive, isProspectsOpen]);
 
   return (
     <Sidebar
@@ -250,16 +311,35 @@ const Navigation = () => {
 
       <NavSection>
         <NavList>
-          {navItems.map((item) => (
-            <NavItem key={item.path}>
-              <NavLink to={item.path} $active={location.pathname === item.path}>
+          <NavItem>
+            <NavButton
+              $active={isProspectsActive}
+              $hasChildren={true}
+              onClick={() => setIsProspectsOpen(!isProspectsOpen)}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <NavIcon>
-                  <item.icon size={20} />
+                  <Target size={20} />
                 </NavIcon>
-                {item.label}
-              </NavLink>
-            </NavItem>
-          ))}
+                Prospects
+              </div>
+              <ChevronIcon $isOpen={isProspectsOpen}>
+                <ChevronDown size={16} />
+              </ChevronIcon>
+            </NavButton>
+            <SubNavList $isOpen={isProspectsOpen}>
+              {prospectsSubItems.map((item) => (
+                <SubNavItem key={item.path}>
+                  <SubNavLink to={item.path} $active={location.pathname === item.path}>
+                    <NavIcon>
+                      <item.icon size={16} />
+                    </NavIcon>
+                    {item.label}
+                  </SubNavLink>
+                </SubNavItem>
+              ))}
+            </SubNavList>
+          </NavItem>
         </NavList>
       </NavSection>
       <CollapseButton $isCollapsed={isCollapsed} onClick={handleToggleCollapse}>

@@ -353,11 +353,12 @@ export class LeadStore {
       const filterTime = filterValue.getTime()
 
       switch (filter.operator) {
-        case 'equals_date':
+        case 'equals_date': {
           // Compare dates without time
           const fieldDate = new Date(fieldValue.getFullYear(), fieldValue.getMonth(), fieldValue.getDate())
           const filterDate = new Date(filterValue.getFullYear(), filterValue.getMonth(), filterValue.getDate())
           return fieldDate.getTime() === filterDate.getTime()
+        }
         case 'before':
           return fieldTime < filterTime
         case 'after':

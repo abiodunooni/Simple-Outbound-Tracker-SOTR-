@@ -4,6 +4,8 @@ import { Layout } from "./components/Layout";
 import { Dashboard } from "./pages/Dashboard";
 import { Leads } from "./pages/Leads";
 import { LeadDetail } from "./pages/LeadDetail";
+import { Companies } from "./pages/Companies";
+import { CompanyDetail } from "./pages/CompanyDetail";
 import { CallHistory } from "./pages/CallHistory";
 import { Analytics } from "./pages/Analytics";
 import { SidebarProvider } from "./context/SidebarContext";
@@ -18,6 +20,8 @@ function App() {
             <Route index path="leads" element={<Leads />} />
             <Route path="/" element={<Dashboard />} />
             <Route path="leads/:id" element={<LeadDetail />} />
+            <Route path="companies" element={<Companies />} />
+            <Route path="companies/:id" element={<CompanyDetail />} />
             <Route path="calls" element={<CallHistory />} />
             <Route path="analytics" element={<Analytics />} />
           </Route>

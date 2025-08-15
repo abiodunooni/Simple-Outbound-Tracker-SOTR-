@@ -15,7 +15,7 @@ export const applyCallLogFilters = (callLogs: CallLog[], filters: CallLogFilterC
   })
 }
 
-const evaluateCondition = (fieldValue: any, condition: CallLogFilterCondition): boolean => {
+const evaluateCondition = (fieldValue: unknown, condition: CallLogFilterCondition): boolean => {
   const { operator, value, value2 } = condition
 
   // Handle null/undefined values

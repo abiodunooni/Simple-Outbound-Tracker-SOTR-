@@ -53,5 +53,6 @@ export class LocalStorageManager {
 
 export const STORAGE_KEYS = {
   LEADS: 'sales_tracker_leads',
-  CALL_LOGS: 'sales_tracker_call_logs'
+  CALL_LOGS: 'sales_tracker_call_logs',
+  COMPANIES: 'sales_tracker_companies'
 } as const

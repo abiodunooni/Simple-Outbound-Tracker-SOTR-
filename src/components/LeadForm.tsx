@@ -224,9 +224,41 @@ const ProductTag = styled.span`
   }
 `;
 
+const CompanySuggestionsDropdown = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 2px;
+`;
+
+const SuggestionItem = styled.div`
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  
+  &:hover {
+    background-color: var(--background-hover);
+  }
+  
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+  }
+`;
+
 interface FormData {
   name: string;
   company: string;
+  companyId?: string;
   phone: string;
   email: string;
   accountOwner: string;
@@ -244,11 +276,12 @@ interface FormErrors {
 
 export const LeadForm: React.FC<LeadFormProps> = observer(
   ({ lead, onSave, onCancel }) => {
-    const { leadStore } = useStore();
+    const { leadStore, companyStore } = useStore();
 
     const [formData, setFormData] = useState<FormData>({
       name: lead?.name || "",
       company: lead?.company || "",
+      companyId: lead?.companyId || "",
       phone: lead?.phone || "",
       email: lead?.email || "",
       accountOwner: lead?.accountOwner || "Sammy",
@@ -268,6 +301,7 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
         setFormData({
           name: lead.name,
           company: lead.company,
+          companyId: lead.companyId || "",
           phone: lead.phone,
           email: lead.email,
           accountOwner: lead.accountOwner,
@@ -277,6 +311,32 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
         });
       }
     }, [lead]);
+
+    const handleCompanyChange = (value: string) => {
+      // Check if the value is an existing company ID
+      const existingCompany = companyStore.companies.find(c => c.id === value);
+      
+      if (existingCompany) {
+        // Selected an existing company
+        setFormData(prev => ({
+          ...prev,
+          company: existingCompany.name,
+          companyId: existingCompany.id
+        }));
+      } else {
+        // Typed a new company name
+        setFormData(prev => ({
+          ...prev,
+          company: value,
+          companyId: undefined
+        }));
+      }
+
+      // Clear company error when user selects/types something
+      if (errors.company) {
+        setErrors(prev => ({ ...prev, company: undefined }));
+      }
+    };
 
     const validateForm = (): boolean => {
       const newErrors: FormErrors = {};
@@ -319,10 +379,37 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
 
       try {
         if (lead) {
+          // Handle company creation if needed for updates too
+          let finalCompanyId = formData.companyId;
+          
+          // If no companyId but we have a company name, check if we need to create a new company
+          if (!finalCompanyId && formData.company?.trim()) {
+            const existingCompany = companyStore.companies.find(
+              c => c.name.toLowerCase() === formData.company.trim().toLowerCase()
+            );
+            
+            if (existingCompany) {
+              finalCompanyId = existingCompany.id;
+            } else {
+              // Create new company
+              const result = companyStore.addCompany({
+                name: formData.company.trim(),
+                industry: "other",
+                size: "startup",
+              });
+              
+              if (result.success && result.company) {
+                finalCompanyId = result.company.id;
+                toast.success(`Created new company: ${result.company.name}`);
+              }
+            }
+          }
+          
           // Update existing lead
           const success = leadStore.updateLead(lead.id, {
             name: formData.name?.trim() || "",
             company: formData.company?.trim() || "",
+            companyId: finalCompanyId,
             phone: formData.phone?.trim() || "",
             email: formData.email?.trim() || "",
             accountOwner: formData.accountOwner?.trim() || "",
@@ -340,10 +427,37 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
           }
           onSave(success);
         } else {
+          // Handle company creation if needed
+          let finalCompanyId = formData.companyId;
+          
+          // If no companyId but we have a company name, check if we need to create a new company
+          if (!finalCompanyId && formData.company?.trim()) {
+            const existingCompany = companyStore.companies.find(
+              c => c.name.toLowerCase() === formData.company.trim().toLowerCase()
+            );
+            
+            if (existingCompany) {
+              finalCompanyId = existingCompany.id;
+            } else {
+              // Create new company
+              const result = companyStore.addCompany({
+                name: formData.company.trim(),
+                industry: "other",
+                size: "startup",
+              });
+              
+              if (result.success && result.company) {
+                finalCompanyId = result.company.id;
+                toast.success(`Created new company: ${result.company.name}`);
+              }
+            }
+          }
+          
           // Create new lead
           const result = leadStore.addLead({
             name: formData.name?.trim() || "",
             company: formData.company?.trim() || "",
+            companyId: finalCompanyId,
             phone: formData.phone?.trim() || "",
             email: formData.email?.trim() || "",
             status: "Cold" as LeadStatus,
@@ -362,6 +476,7 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
             setFormData({
               name: "",
               company: "",
+              companyId: undefined,
               phone: "",
               email: "",
               accountOwner: "Sammy",
@@ -427,14 +542,38 @@ export const LeadForm: React.FC<LeadFormProps> = observer(
         <FormRow>
           <FormGroup>
             <Label htmlFor="company">Company *</Label>
-            <Input
-              id="company"
-              type="text"
-              value={formData.company}
-              onChange={(e) => handleInputChange("company", e.target.value)}
-              $hasError={!!errors.company}
-              placeholder="Enter company name"
-            />
+            <div style={{ position: 'relative' }}>
+              <Input
+                id="company"
+                type="text"
+                value={formData.company}
+                onChange={(e) => handleCompanyChange(e.target.value)}
+                $hasError={!!errors.company}
+                placeholder="Type or select company name..."
+                autoComplete="off"
+              />
+              {formData.company && companyStore.companies.length > 0 && (
+                <CompanySuggestionsDropdown>
+                  {companyStore.companies
+                    .filter(company => 
+                      company.name.toLowerCase().includes(formData.company.toLowerCase()) &&
+                      company.name.toLowerCase() !== formData.company.toLowerCase()
+                    )
+                    .slice(0, 5)
+                    .map((company) => (
+                      <SuggestionItem 
+                        key={company.id}
+                        onClick={() => handleCompanyChange(company.id)}
+                      >
+                        {company.name}
+                        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                          {company.industry} • {company.size}
+                        </span>
+                      </SuggestionItem>
+                    ))}
+                </CompanySuggestionsDropdown>
+              )}
+            </div>
             {errors.company && <ErrorMessage>{errors.company}</ErrorMessage>}
           </FormGroup>
 

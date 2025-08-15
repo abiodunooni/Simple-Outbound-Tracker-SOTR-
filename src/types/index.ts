@@ -10,10 +10,31 @@ export type OpportunitySize = '<$50k' | '$50k-$200k' | '$500k-$1m' | '$1m-$5m' |
 
 export type Product = 'API' | 'Payments' | 'Ramp' | 'OTC'
 
+export type CompanySize = 'startup' | 'small' | 'medium' | 'large' | 'enterprise'
+
+export type Industry = 'fintech' | 'e-commerce' | 'healthcare' | 'education' | 'gaming' | 'logistics' | 'real-estate' | 'government' | 'non-profit' | 'other'
+
+export interface Company {
+  id: string
+  name: string
+  website?: string
+  industry: Industry
+  size: CompanySize
+  location?: string
+  description?: string
+  createdAt: Date
+  updatedAt: Date
+  createdBy: string
+  accountOwner: string
+  lastContactedAt: Date | null
+  notes?: string
+}
+
 export interface Lead {
   id: string
   name: string
   company: string
+  companyId?: string
   phone: string
   email: string
   status: LeadStatus
@@ -88,6 +109,17 @@ export interface FilterCondition {
   dataType: FilterDataType
 }
 
+export interface CompanyFilterCondition {
+  id: string
+  field: keyof Company
+  operator: FilterOperator
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value2?: any // For between operations
+  dataType: FilterDataType
+}
+
 export interface FilterOption {
   label: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,6 +128,14 @@ export interface FilterOption {
 
 export interface FilterConfig {
   field: keyof Lead
+  label: string
+  dataType: FilterDataType
+  operators: FilterOperator[]
+  options?: FilterOption[] // for select/multi-select
+}
+
+export interface CompanyFilterConfig {
+  field: keyof Company
   label: string
   dataType: FilterDataType
   operators: FilterOperator[]
